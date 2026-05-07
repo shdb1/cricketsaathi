@@ -30,7 +30,7 @@ const IPL_PLAYERS = [
 // SET USE_MOCK = true  → fake data, zero API calls (dev mode)
 // SET USE_MOCK = false → real CricAPI data (production mode)
 // ============================================================
-const USE_MOCK = true;
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
 const MOCK_MATCHES = [
   {
@@ -65,8 +65,8 @@ const MOCK_MATCHES = [
 function useMatches() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
-  const AUTO_REFRESH = false;
-  const REFRESH_INTERVAL = 30000;
+  const AUTO_REFRESH = import.meta.env.VITE_AUTO_REFRESH === "true";
+  const REFRESH_INTERVAL = Number(import.meta.env.VITE_REFRESH_INTERVAL) || 3600000;
 
   useEffect(() => {
     // MOCK MODE — zero API calls
