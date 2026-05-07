@@ -5,6 +5,28 @@ import { useState, useEffect } from 'react';
 const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY;
 const API_BASE = '/api';
 
+const ENABLE_BROWSER_NOTIFICATIONS =
+  import.meta.env
+    .VITE_ENABLE_BROWSER_NOTIFICATIONS === 'true';
+
+const ENABLE_SERVER_NOTIFICATIONS =
+  import.meta.env
+    .VITE_ENABLE_SERVER_NOTIFICATIONS === 'true';
+
+const ENABLE_VERCEL_CRON =
+  import.meta.env
+    .VITE_ENABLE_VERCEL_CRON === 'true';
+
+const BROWSER_POLL_INTERVAL =
+  Number(
+    import.meta.env
+      .VITE_BROWSER_POLL_INTERVAL || 60000
+  );
+
+const ENABLE_DEBUG_LOGS =
+  import.meta.env
+    .VITE_ENABLE_DEBUG_LOGS === 'true';
+
 // Convert VAPID key to Uint8Array for browser
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -31,17 +53,76 @@ export function useNotifications() {
     catch { return []; }
   });
   const [loading, setLoading] = useState(false);
-
   useEffect(() => {
-    // Check if already subscribed
-    if ('serviceWorker' in navigator && permission === 'granted') {
-      navigator.serviceWorker.ready.then(reg => {
-        reg.pushManager.getSubscription().then(sub => {
+  // FEATURE DISABLED
+
+  if (!ENABLE_BROWSER_NOTIFICATIONS) {
+    console.log(
+      'Browser notifications disabled'
+    );
+
+    return;
+  }
+
+  // EXISTING CODE
+
+  if (
+    'serviceWorker' in navigator &&
+    permission === 'granted'
+  ) {
+    navigator.serviceWorker.ready.then(reg => {
+      reg.pushManager
+        .getSubscription()
+        .then(sub => {
           if (sub) setSubscription(sub);
         });
-      });
+    });
+  }
+
+  // BROWSER POLLING MODE
+
+  const pollLiveMatches = async () => {
+    try {
+      // SAVE API HITS
+
+      if (document.hidden) {
+        if (ENABLE_DEBUG_LOGS) {
+          console.log(
+            'Tab hidden → skipping poll'
+          );
+        }
+
+        return;
+      }
+
+      if (ENABLE_DEBUG_LOGS) {
+        console.log(
+          'Polling live match updates...'
+        );
+      }
+
+      // YOUR FUTURE LIVE CHECKING CODE HERE
+
+      // Example:
+      // fetch live score
+      // detect batsman
+      // show notification
+
+    } catch (err) {
+      console.error(err);
     }
-  }, []);
+  };
+
+  const interval = setInterval(
+    pollLiveMatches,
+    BROWSER_POLL_INTERVAL
+  );
+
+  pollLiveMatches();
+
+  return () => clearInterval(interval);
+
+}, [permission]);
 
   const requestPermission = async () => {
     setLoading(true);
