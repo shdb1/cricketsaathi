@@ -53,7 +53,7 @@ function extractBowlingPlayers(scorecard) {
     const innings = scorecard.scorecard || [];
     for (const inning of innings) {
       const bowlers = inning?.bowling || [];
-      // Last bowler in list is usually currently bowling
+      // Last bowler in list is usually currently bowling.
       if (bowlers.length > 0) {
         const current = bowlers[bowlers.length - 1];
         bowling.push(current?.bowler?.name || current?.name);
